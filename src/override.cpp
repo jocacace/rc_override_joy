@@ -7,6 +7,8 @@ rc_override::rc_override() {
   _joy_sub = _nh.subscribe("/joy", 0, &rc_override::joy_cb, this);
 
   _a0 = _a1 = _b0 = _b1 = 0.0;
+	_chan5 = 1500;
+	_chan6 = 1000;
 }
 
 void rc_override::joy_cb( sensor_msgs::Joy data ) {
@@ -14,6 +16,22 @@ void rc_override::joy_cb( sensor_msgs::Joy data ) {
   _a1 = data.axes[1];
   _b0 = data.axes[2];
   _b1 = data.axes[3];
+	
+	if (data.buttons[X]){
+		_chan5 = 1000;
+	}
+	if (data.buttons[A]){
+		_chan5 = 1500;
+	}
+	if (data.buttons[B]){
+		_chan5 = 2000;
+	}
+	if (data.buttons[LB]){
+		_chan6 = 1000;
+	}
+	if (data.buttons[RB]){
+		_chan6 = 2000;
+	}
 }
 
 void rc_override::run() {
@@ -26,13 +44,15 @@ void rc_override::override() {
 
   mavros_msgs::OverrideRCIn rc;
 
-  ros::Rate r(10);
+  ros::Rate r(20);
   while(ros::ok()) {
 
-    rc.channels[0] = ( _b0 >= 0.0 ) ? (_b0*700) + 1500 : (1500 + (_b0*700) );
-    rc.channels[1] = ( _b1 <= 0.0 ) ? (_b1*700) + 1500 : (1500 + (_b1*700) );
-    rc.channels[2] = ( _a1 > 0.0 ) ? (_a1*700) + 1500 : 800;
-    rc.channels[3] = ( _a0 <= 0.0 ) ? (_a0*700) + 1500 : (1500 + (_a0*700) );
+    rc.channels[0] = ( _b0 > 0.0 ) ? (_b0*500) + 1500 : (1500 + (_b0*500) );
+    rc.channels[1] = ( _b1 <= 0.0 ) ? (_b1*500) + 1500 : (1500 + (_b1*500) );
+    rc.channels[2] = ( _a1 > 0.0 ) ? (_a1*500) + 1500 : (1500 + (_a1*500) );
+    rc.channels[3] = ( _a0 <= 0.0 ) ? (_a0*500) + 1500 : (1500 + (_a0*500) );
+		rc.channels[4] = _chan5;
+		rc.channels[5] = _chan6;
 
     _rc_pub.publish( rc ) ;
     r.sleep();
