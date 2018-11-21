@@ -19,5 +19,7 @@ private:
 
   float _a0, _a1;
   float _b0, _b1;
+	enum Buttons { X, A, B, Y, LB, RB };
+	int _chan5, _chan6;
 
 };
