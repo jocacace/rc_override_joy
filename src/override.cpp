@@ -2,34 +2,78 @@
 
 using namespace std;
 
+//---Get parameters
+void load_param( double & p, double def, string name ) {
+	ros::NodeHandle n_param("~");
+	if( !n_param.getParam( name, p))
+		p = def;
+	cout << name << ": " << "\t" << p << endl;
+}
+
+void load_param( int & p, int def, string name ) {
+	ros::NodeHandle n_param("~");
+	if( !n_param.getParam( name, p))
+		p = def;
+	cout << name << ": " << "\t" << p << endl;
+}
+
+void load_param( bool & p, bool def, string name ) {
+	ros::NodeHandle n_param("~");
+	if( !n_param.getParam( name, p))
+		p = def;
+	cout << name << ": " << "\t" << p << endl;
+}
+
+void load_param( string & p, string def, string name ) {
+	ros::NodeHandle n_param("~");
+	if( !n_param.getParam( name, p))
+		p = def;
+	cout << name << ": " << "\t" << p << endl;
+}
+//---
+
+
 rc_override::rc_override() {
   _rc_pub = _nh.advertise<mavros_msgs::OverrideRCIn>("/mavros/rc/override", 0);
   _joy_sub = _nh.subscribe("/joy", 0, &rc_override::joy_cb, this);
 
-  _a0 = _a1 = _b0 = _b1 = 0.0;
+  load_param( _thurst_ax, 1, "thrust_ax" );
+  load_param( _yaw_ax,    0, "yaw_ax" );
+  load_param( _roll_ax,   2, "roll_ax" );
+  load_param( _pitch_ax,  3, "pitch_ax" );
+
+  load_param( _chan5_low_btn,  		0, "chan5_low_btn" );
+  load_param( _chan5_middle_btn,  1, "chan5_middle_btn" );
+  load_param( _chan5_high_btn,  	2, "chan5_high_btn" );
+
+  load_param( _chan6_low_btn,  	4, "chan6_low_btn" );
+  load_param( _chan6_high_btn,  6, "chan6_high_btn" );
+
+	_thrust = _roll = _pitch = _yaw = 0.0;
 	_chan5 = 1500;
 	_chan6 = 1000;
 }
 
 void rc_override::joy_cb( sensor_msgs::Joy data ) {
-  _a0 = data.axes[0];
-  _a1 = data.axes[1];
-  _b0 = data.axes[2];
-  _b1 = data.axes[3];
-	
-	if (data.buttons[X]){
+
+	_yaw = data.axes[_yaw_ax];
+	_thrust = data.axes[_thurst_ax];
+  _roll = data.axes[_roll_ax];
+  _pitch = data.axes[_pitch_ax];
+
+	if (data.buttons[_chan5_low_btn]){
 		_chan5 = 1000;
 	}
-	if (data.buttons[A]){
+	if (data.buttons[_chan5_middle_btn]){
 		_chan5 = 1500;
 	}
-	if (data.buttons[B]){
+	if (data.buttons[_chan5_high_btn]){
 		_chan5 = 2000;
 	}
-	if (data.buttons[LB]){
+	if (data.buttons[_chan6_low_btn]){
 		_chan6 = 1000;
 	}
-	if (data.buttons[RB]){
+	if (data.buttons[_chan6_high_btn]){
 		_chan6 = 2000;
 	}
 }
@@ -47,10 +91,10 @@ void rc_override::override() {
   ros::Rate r(20);
   while(ros::ok()) {
 
-    rc.channels[0] = ( _b0 > 0.0 ) ? (_b0*500) + 1500 : (1500 + (_b0*500) );
-    rc.channels[1] = ( _b1 <= 0.0 ) ? (_b1*500) + 1500 : (1500 + (_b1*500) );
-    rc.channels[2] = ( _a1 > 0.0 ) ? (_a1*500) + 1500 : (1500 + (_a1*500) );
-    rc.channels[3] = ( _a0 <= 0.0 ) ? (_a0*500) + 1500 : (1500 + (_a0*500) );
+    rc.channels[0] = ( _roll > 0.0 ) ? (_roll*500) + 1500 : (1500 + (_roll*500) );
+    rc.channels[1] = ( _pitch <= 0.0 ) ? (_pitch*500) + 1500 : (1500 + (_pitch*500) );
+    rc.channels[2] = ( _thrust > 0.0 ) ? (_thrust*500) + 1500 : (1500 + (_thrust*500) );
+    rc.channels[3] = ( _yaw <= 0.0 ) ? (_yaw*500) + 1500 : (1500 + (_yaw*500) );
 		rc.channels[4] = _chan5;
 		rc.channels[5] = _chan6;
 

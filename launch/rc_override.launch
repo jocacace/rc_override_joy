@@ -1,0 +1,23 @@
+<?xml version="1.0" ?>
+
+<launch>
+
+  <!-- Joypad -->
+  <node name="joy" pkg="joy" type="joy_node" output="screen">
+    <param name="dev" type="string" value="/dev/input/js0"/>
+  </node>
+
+  <node pkg="rc_override_joy" type="rc_override" name="rc_override" output="screen" >
+    <param name="thurst_ax" value="1" type="int" />
+    <param name="roll_ax" value="2" type="int" />
+    <param name="pitch_ax" value="3" type="int" />
+    <param name="yaw_ax" value="0" type="int" />
+
+    <param name="chan5_low_btn"     value="0" type="int" />
+    <param name="chan5_middle_btn"  value="1" type="int" />
+    <param name="chan5_high_btn"    value="3" type="int" />
+    <param name="chan6_low_btn"     value="4" type="int" />
+    <param name="chan6_high_btn"    value="6" type="int" />
+  </node>
+
+</launch>
