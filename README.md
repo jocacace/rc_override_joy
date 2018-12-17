@@ -26,7 +26,7 @@ To configure your own joypad you can use a set of ROS parameters, as specified i
 
 To set the desired parameter values, you can check how is configured your joypad. To do this, you can *echo* the */joy* topic, where the joypad data are streamed:
 
-    $ roslaunch r_override_joy rc_override.roslaunch
+    $ roslaunch rc_override_joy rc_override.roslaunch
     $ rostopic echo /joy
 Now you can move the buttons and the sticks of your joypad configration, save the *id* of the axes and buttons field.  
 
@@ -40,4 +40,4 @@ Now you can move the buttons and the sticks of your joypad configration, save th
 ## Running the node
 To start the rc_override node launche the properly configured launch file:
 
-    $ roslaunch r_override_joy rc_override.roslaunch
+    $ roslaunch rc_override_joy rc_override.roslaunch
